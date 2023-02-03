@@ -14,6 +14,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
+import org.joisen.app.func.DimSinkFunction;
 import org.joisen.app.func.TableProcessFunction;
 import org.joisen.bean.TableProcess;
 import org.joisen.utils.MyKafkaUtil;
@@ -23,6 +24,8 @@ import org.joisen.utils.MyKafkaUtil;
  * @Date 2023/2/1 17:32
  * @Version 1.0
  */
+// 数据流： web/app -> nginx -> 业务服务器 -> Mysql(binlog) -> Maxwell -> Kafka(ODS) -> FlinkApp -> phoenix
+// 程序: Mock -> Mysql(binlog) -> Maxwell -> Kafka(ZK) -> DimApp -> Phoenix(HBase/ZK/HDFS)
 public class DimApp {
     public static void main(String[] args) throws Exception {
 
@@ -95,6 +98,7 @@ public class DimApp {
 
         // todo 8. 将数据写出到Phoenix
         dimDS.print(">>>>>>>>>>>");
+        dimDS.addSink(new DimSinkFunction());
 
         // todo 9. 启动任务
         env.execute("DimApp");
