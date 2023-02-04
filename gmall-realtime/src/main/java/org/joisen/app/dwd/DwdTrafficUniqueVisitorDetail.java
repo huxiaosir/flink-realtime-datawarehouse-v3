@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONAware;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -21,6 +23,9 @@ import org.joisen.utils.MyKafkaUtil;
  * @Date 2023/2/3 20:01
  * @Version 1.0
  */
+
+// 数据流： web/app -> Nginx -> 日志服务器(.log) -> Flume -> Kafka(ODS) -> FlinkApp -> Kafka(DWD) -> FlinkApp -> Kafka(DWD)
+// 程  序：      Mock(log_0105.sh) -> Flume(flume1_0105.sh) -> Kafka(ZK) -> BaseLogApp -> Kafka(ZK) -> DwdTrafficUniqueVisitorDetail -> Kafka(ZK)
 public class DwdTrafficUniqueVisitorDetail {
 
     public static void main(String[] args) throws Exception {
@@ -66,12 +71,19 @@ public class DwdTrafficUniqueVisitorDetail {
         KeyedStream<JSONObject, String> keyedStream = jsonObjDS.keyBy(json -> json.getJSONObject("common").getString("mid"));
 
         // todo 5. 使用状态编程时间按照mid去重
+        // 需要实现状态过期： 1、定时器： 需要在process中实现
+        //                 2、TTL：设置状态存活时间为24h，更改状态时更新过期时间
         SingleOutputStreamOperator<JSONObject> uvDS = keyedStream.filter(new RichFilterFunction<JSONObject>() {
             private ValueState<String> lastVisitState;
 
             @Override
             public void open(Configuration parameters) throws Exception {
                 ValueStateDescriptor<String> stateDescriptor = new ValueStateDescriptor<>("last-visit", String.class);
+                // 设置状态的TTL
+                StateTtlConfig ttlConfig = new StateTtlConfig.Builder(Time.days(1))
+                        .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
+                        .build();
+                stateDescriptor.enableTimeToLive(ttlConfig);
                 lastVisitState = getRuntimeContext().getState(stateDescriptor);
             }
 
