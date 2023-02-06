@@ -104,6 +104,23 @@ public class MyKafkaUtil {
     }
 
     /**
+     * UpsertKafka-Sink DDL 语句
+     *
+     * @param topic 输出到 Kafka 的目标主题
+     * @return 拼接好的 UpsertKafka-Sink DDL 语句
+     */
+    public static String getUpsertKafkaDDL(String topic) {
+
+        return "WITH ( " +
+                "  'connector' = 'upsert-kafka', " +
+                "  'topic' = '" + topic + "', " +
+                "  'properties.bootstrap.servers' = '" + KAFKA_SERVER + "', " +
+                "  'key.format' = 'json', " +
+                "  'value.format' = 'json' " +
+                ")";
+    }
+
+    /**
      * topic_db_0105主题的 Kafka-Source DDL语句
      * @param groupId 消费者组
      * @return        拼接好的 Kafka 数据源 DDL 语句
@@ -118,6 +135,8 @@ public class MyKafkaUtil {
                 "  `pt` AS PROCTIME()  " +
                 ") " + getKafkaDDL("topic_db_0105", groupId);
     }
+
+
 
 
 }
