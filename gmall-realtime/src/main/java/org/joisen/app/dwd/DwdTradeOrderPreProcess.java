@@ -14,6 +14,8 @@ import java.time.Duration;
  * @Date 2023/2/5 17:11
  * @Version 1.0
  */
+// 数据流： Web/App  -> nginx  -> 业务服务器（MySQL） ->  Maxwell  -> Kafka(ODS)  ->  FlinkApp  ->  Kafka(DWD)
+// 程序：      Mock -> Mysql  -> Maxwell  ->  Kafka(ZK)  ->  DwdTradeOrderPreProcess  -> Kafka(ZK)
 public class DwdTradeOrderPreProcess {
     public static void main(String[] args) throws Exception {
 
@@ -246,7 +248,7 @@ public class DwdTradeOrderPreProcess {
         tableEnv.executeSql(" insert into dwd_order_pre select * from result_table ");
 
         // todo 11. 启动任务
-        env.execute("DwdTradeOrderPreProcess");
+//        env.execute("DwdTradeOrderPreProcess");  // 没有流的操作不需要   如果保留启动程序会报异常(没有行动算子) 但不影响程序执行
 
     }
 }

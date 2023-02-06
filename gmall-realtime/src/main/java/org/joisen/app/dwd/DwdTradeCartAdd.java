@@ -12,6 +12,8 @@ import org.joisen.utils.MysqlUtil;
  * @Date 2023/2/5 11:14
  * @Version 1.0
  */
+// 数据流： Web/App  -> nginx  -> 业务服务器（MySQL） ->  Maxwell  -> Kafka(ODS)  ->  FlinkApp  ->  Kafka(DWD)
+// 程序：      Mock -> Mysql  -> Maxwell  ->  Kafka(ZK)  ->  DwdTradeCartAdd  -> Kafka(ZK)
 public class DwdTradeCartAdd {
     public static void main(String[] args) throws Exception {
 
