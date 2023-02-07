@@ -74,7 +74,7 @@ public class MyKafkaUtil {
 
     /**
      * Kafka-Source DDL 语句
-     *
+     * 从kafka主题中获得数据
      * @param topic   数据源主题
      * @param groupId 消费者组
      * @return 拼接好的 Kafka 数据源 DDL 语句
