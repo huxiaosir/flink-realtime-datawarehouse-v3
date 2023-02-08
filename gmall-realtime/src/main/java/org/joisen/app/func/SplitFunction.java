@@ -14,14 +14,14 @@ import java.util.List;
  * @Date 2023/2/7 16:48
  * @Version 1.0
  */
-@FunctionHint(output = @DataTypeHint("ROW<word STRING, length INT>"))
+@FunctionHint(output = @DataTypeHint("ROW<word STRING>"))
 public  class SplitFunction extends TableFunction<Row> {
 
     public void eval(String str) {
 //        for (String s : str.split(" ")) {
-//            // use collect(...) to emit a row
 //            collect(Row.of(s, s.length()));
 //        }
+
         List<String> list = null;
         try {
             list = KeywordUtil.splitKeyword(str);
@@ -31,6 +31,5 @@ public  class SplitFunction extends TableFunction<Row> {
         } catch (IOException e) {
             collect(Row.of(str));
         }
-
     }
 }
