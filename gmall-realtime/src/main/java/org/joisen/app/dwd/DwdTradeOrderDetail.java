@@ -36,7 +36,7 @@ public class DwdTradeOrderDetail {
 //        tableEnv.getConfig().setIdleStateRetention(Duration.ofSeconds(5));
 
         // todo 2. 读取kafka订单预处理主题 dwd_trade_order_pre_process_0105 数据 创建表
-        tableEnv.executeSql("" +
+        tableEnv.executeSql(" " +
                 "create table dwd_order_pre( " +
                 "    `id` string, " +
                 "    `order_id` string, " +
@@ -80,7 +80,8 @@ public class DwdTradeOrderDetail {
                 "    `coupon_id` string, " +
                 "    `coupon_use_id` string, " +
                 "    `type` string, " +
-                "    `old` map<string,string> " +
+                "    `old` map<string,string>, " +
+                "    `row_op_ts` TIMESTAMP_LTZ(3)  " +
                 ") " + MyKafkaUtil.getKafkaDDL("dwd_trade_order_pre_process_0105", "order_detail_0105"));
 
         // todo 3. 过滤出下单数据， 即新增数据
@@ -106,9 +107,9 @@ public class DwdTradeOrderDetail {
 //                "split_original_amount, " +
                 "split_activity_amount, " +
                 "split_coupon_amount, " +
-                "split_total_amount " +   // 删除 ，
+                "split_total_amount, " +
 //                "od_ts ts, " +
-//                "row_op_ts " +
+                "row_op_ts " +
                 "from dwd_order_pre " +
                 "where `type`='insert'");
         tableEnv.createTemporaryView("filtered_table", filteredTable);
@@ -136,9 +137,9 @@ public class DwdTradeOrderDetail {
 //                "split_original_amount string, " +
                 "split_activity_amount string, " +
                 "split_coupon_amount string, " +
-                "split_total_amount string " +  // 删除 ，
+                "split_total_amount string, " +  // 删除 ，
 //                "ts string, " +
-//                "row_op_ts timestamp_ltz(3) " +
+                "row_op_ts timestamp_ltz(3) " +
                 ")" + MyKafkaUtil.getKafkaSinkDDL("dwd_trade_order_detail_0105"));
 
 

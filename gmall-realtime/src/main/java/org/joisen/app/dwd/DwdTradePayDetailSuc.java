@@ -78,9 +78,9 @@ public class DwdTradePayDetailSuc {
 //                "split_original_amount string, " +
                 "split_activity_amount string, " +
                 "split_coupon_amount string, " +
-                "split_total_amount string " +  // 删除 ，
+                "split_total_amount string, " +
 //                "ts string, " +
-//                "row_op_ts timestamp_ltz(3) " +
+                "row_op_ts timestamp_ltz(3) " +
                 ")" + MyKafkaUtil.getKafkaDDL("dwd_trade_order_detail_0105", "pay_detail_suc_order_0105"));
 
         // todo 4. 读取MySQL Basic_Dic表
@@ -109,9 +109,9 @@ public class DwdTradePayDetailSuc {
 //                "od.split_original_amount, " +
                 "od.split_activity_amount, " +
                 "od.split_coupon_amount, " +
-                "od.split_total_amount split_payment_amount " + // 删除 ，
+                "od.split_total_amount split_payment_amount, " +
 //                "pi.ts, " +
-//                "od.row_op_ts row_op_ts " +
+                "od.row_op_ts row_op_ts " +
                 "from payment_info pi " +
                 "join dwd_trade_order_detail od " +
                 "on pi.order_id = od.order_id " +
@@ -143,7 +143,7 @@ public class DwdTradePayDetailSuc {
                 "split_coupon_amount string, " +
                 "split_payment_amount string, " +
 //                "ts string, " +
-//                "row_op_ts timestamp_ltz(3), " +
+                "row_op_ts timestamp_ltz(3), " +
                 "primary key(order_detail_id) not enforced " +
                 ")" + MyKafkaUtil.getUpsertKafkaDDL("dwd_trade_pay_detail_suc_0105"));
 
