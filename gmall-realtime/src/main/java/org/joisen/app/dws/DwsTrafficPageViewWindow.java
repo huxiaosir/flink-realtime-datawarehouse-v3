@@ -120,7 +120,7 @@ public class DwsTrafficPageViewWindow {
 
                 // 获取状态数据以及当前数据中的日期
                 Long ts = value.getLong("ts");
-                String curDt = DateFormatUtil.toDate(value.getLong("ts"));
+                String curDt = DateFormatUtil.toDate(ts);
                 String homeLastDt = homeLastState.value();
                 String detailLastDt = detailLastState.value();
 
