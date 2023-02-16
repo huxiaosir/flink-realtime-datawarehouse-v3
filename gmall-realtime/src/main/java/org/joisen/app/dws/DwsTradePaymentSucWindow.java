@@ -42,7 +42,7 @@ public class DwsTradePaymentSucWindow {
         // todo 1. 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+//        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
         // TODO 1.1. 状态后端设置
 //        env.enableCheckpointing(3000L, CheckpointingMode.EXACTLY_ONCE);

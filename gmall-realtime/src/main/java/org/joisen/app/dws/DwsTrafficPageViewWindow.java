@@ -64,7 +64,7 @@ public class DwsTrafficPageViewWindow {
         String groupId = "dws_traffic_page_view_window_0105";
         DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtil.getFlinkKafkaConsumer(topic, groupId));
 
-        // todo 3. 将每行数据转换为JSON对象并过滤
+        // todo 3. 将每行数据转换为JSON对象并过滤(首页与商品详情页)
         SingleOutputStreamOperator<JSONObject> jsonObjDS = kafkaDS.flatMap(new FlatMapFunction<String, JSONObject>() {
             @Override
             public void flatMap(String s, Collector<JSONObject> collector) throws Exception {
@@ -129,14 +129,18 @@ public class DwsTrafficPageViewWindow {
                 long detailCt = 0L;
 
                 // 如果状态为空或者状态时间与当前时间不同，则为需要的数据
-                if (homeLastDt == null || !homeLastDt.equals(curDt)) {
-                    homeCt = 1L;
-                    homeLastState.update(curDt);
+                if ("home".equals(value.getJSONObject("page").getString("page_id"))) {
+                    if (homeLastDt == null || !homeLastDt.equals(curDt)) {
+                        homeCt = 1L;
+                        homeLastState.update(curDt);
+                    }
+                }else{
+                    if (detailLastDt == null || !detailLastDt.equals(curDt)) {
+                        detailCt = 1L;
+                        detailLastState.update(curDt);
+                    }
                 }
-                if (detailLastDt == null || !detailLastDt.equals(curDt)) {
-                    detailCt = 1L;
-                    detailLastState.update(curDt);
-                }
+
                 // 满足任何一个数据不等于0，则可以写出
                 if (homeCt == 1L || detailCt == 1L) {
                     collector.collect(new TrafficHomeDetailPageViewBean("", "",

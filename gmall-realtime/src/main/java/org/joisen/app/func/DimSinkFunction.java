@@ -5,6 +5,7 @@ import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.joisen.utils.DimUtil;
 import org.joisen.utils.DruidDSUtil;
 import org.joisen.utils.PhoenixUtil;
 
@@ -29,9 +30,17 @@ public class DimSinkFunction extends RichSinkFunction<JSONObject> {
         // 获取连接
         DruidPooledConnection connection = druidDataSource.getConnection();
 
-        // 写出数据
         String sinkTable = value.getString("sinkTable");
         JSONObject data = value.getJSONObject("data");
+
+        // 获取数据类型
+        String type = value.getString("type");
+        // 如果为更新数据 则需要删除redis中的数据
+        if ("update".equals(type)) {
+            DimUtil.delDimInfo(sinkTable.toUpperCase(), data.getString("id"));
+        }
+
+        // 写出数据
         // 出现异常不进行捕获，直接抛出异常，程序终止运行
         PhoenixUtil.upsertValues(connection, sinkTable, data);
 
